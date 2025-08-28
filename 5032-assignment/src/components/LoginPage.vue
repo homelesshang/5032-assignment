@@ -3,7 +3,7 @@
     <div class="card">
       <h2 class="title">Community Gym Login</h2>
 
-      <form>
+      <form @submit.prevent="handleLogin">
         <div class="form-group">
           <input type="text" placeholder="Username" />
         </div>
@@ -21,7 +21,13 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
+function handleLogin() {
+  
+  router.push('/main')
+}
 </script>
 
 <style scoped>
