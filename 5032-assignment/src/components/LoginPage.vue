@@ -1,36 +1,45 @@
+<!-- src/pages/LoginPage.vue -->
 <template>
-  <div class="loginpage">
-    <div class="card">
-      <h2 class="title">Community Gym Login</h2>
-      <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 col-xxl-4">
+        <h2 class="text-center mb-4">Community Gym Login</h2>
 
-      <form @submit.prevent="handleLogin">
-        <div class="form-group">
-          <input
-            v-model="username"
-            type="text"
-            placeholder="Username"
-            :class="{'input-error': usernameError}"
-            required
-          />
-          <span v-if="usernameError" class="error-text">Username is required</span>
-        </div>
-        <div class="form-group">
-          <input
-            v-model="password"
-            type="password"
-            placeholder="Password"
-            :class="{'input-error': passwordError}"
-            required
-          />
-          <span v-if="passwordError" class="error-text">Password is required</span>
-        </div>
-        <button type="submit" class="btn">Login</button>
-      </form>
-      <p class="foot">
-        Don't have an account?
-        <router-link class="link" to="/register">Create one</router-link>
-      </p>
+        <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+        <form @submit.prevent="handleLogin" novalidate>
+          <!-- Username -->
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input
+              id="username"
+              v-model="username"
+              type="text"
+              class="form-control"
+              :class="{'is-invalid': usernameError}"
+            />
+            <div v-if="usernameError" class="invalid-feedback">Username is required</div>
+          </div>
+
+          <!-- Password -->
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input
+              id="password"
+              v-model="password"
+              type="password"
+              class="form-control"
+              :class="{'is-invalid': passwordError}"
+            />
+            <div v-if="passwordError" class="invalid-feedback">Password is required</div>
+          </div>
+
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary me-2">Login</button>
+            <router-link to="/register" class="btn btn-secondary">Create one</router-link>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -39,7 +48,7 @@
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
-function handleLoginn() {
+function handleLogin() {
   
   router.push('/main')
 }

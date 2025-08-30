@@ -1,73 +1,89 @@
 <!-- src/pages/RegisterPage.vue -->
 <template>
-  <div class="registerpage">
-    <div class="card">
-      <h2 class="title">Create Your Gym Account</h2>
-      <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-      <form @submit.prevent="handleRegister" >
-        <div class="form-group">
-          <input
-            v-model="fullName"
-            type="text"
-            placeholder="Full name"
-            :class="{'input-error': fullNameError}"
-            required
-          />
-          <span v-if="fullNameError" class="error-text">Full name is required</span>
-        </div>
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 col-xxl-4">
+        <h2 class="text-center mb-4">Create Your Gym Account</h2>
 
-        <div class="form-group">
-          <input
-            v-model="email"
-            type="email"
-            placeholder="Email"
-            :class="{'input-error': emailError}"
-            required
-          />
-          <span v-if="emailError" class="error-text">Valid email is required</span>
-        </div>
+       
+        <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
-        <div class="form-group">
-          <input
-            v-model="password"
-            type="password"
-            placeholder="Password"
-            :class="{'input-error': passwordError}"
-            required
-          />
-          <span v-if="passwordError" class="error-text">Password is required</span>
-        </div>
+        <form @submit.prevent="handleRegister" novalidate>
+          <!-- Full name -->
+          <div class="mb-3">
+            <label for="fullName" class="form-label">Full name</label>
+            <input
+              id="fullName"
+              v-model="fullName"
+              type="text"
+              class="form-control"
+              :class="{'is-invalid': fullNameError}"
+            />
+            <div v-if="fullNameError" class="invalid-feedback">Full name is required</div>
+          </div>
 
-        <div class="form-group">
-          <input
-            v-model="confirmPassword"
-            type="password"
-            placeholder="Confirm password"
-            :class="{'input-error': confirmPasswordError}"
-            required
-          />
-          <span v-if="confirmPasswordError" class="error-text">Passwords must match</span>
-        </div>
+          <!-- Email -->
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input
+              id="email"
+              v-model="email"
+              type="email"
+              class="form-control"
+              :class="{'is-invalid': emailError}"
+            />
+            <div v-if="emailError" class="invalid-feedback">Valid email is required</div>
+          </div>
 
-        <label class="agree">
-          <input v-model="agreeTerms" type="checkbox" />
-          <span>I agree to the Terms</span>
-        </label>
-        <span v-if="!agreeTerms" class="error-text">You must agree to the terms</span>
+          <!-- Password -->
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input
+              id="password"
+              v-model="password"
+              type="password"
+              class="form-control"
+              :class="{ 'is-invalid': passwordError || (password && !passwordStrong) }"
+            />
+            <div v-if="passwordError" class="invalid-feedback">Password is required</div>
+            <div v-else-if="password && !passwordStrong" class="invalid-feedback">
+              Password must be at least 8 characters and include letters and numbers
+            </div>
+          </div>
 
-        <button type="submit" class="btn">Create account</button>
-      </form>
+          <!-- Confirm password -->
+          <div class="mb-3">
+            <label for="confirmPassword" class="form-label">Confirm password</label>
+            <input
+              id="confirmPassword"
+              v-model="confirmPassword"
+              type="password"
+              class="form-control"
+              :class="{'is-invalid': confirmPasswordError}"
+            />
+            <div v-if="confirmPasswordError" class="invalid-feedback">Passwords must match</div>
+          </div>
 
-      <p class="foot">
-        Already have an account?
-        <router-link class="link" to="/login">Login</router-link>
-      </p>
+          <!-- Terms -->
+          <div class="form-check mb-3">
+            <input id="agreeTerms" v-model="agreeTerms" type="checkbox" class="form-check-input" />
+            <label for="agreeTerms" class="form-check-label">I agree to the Terms</label>
+          </div>
+          <div v-if="!agreeTerms" class="text-danger small">You must agree to the terms</div>
+
+          <!-- Buttons -->
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary me-2">Create account</button>
+            <router-link to="/login" class="btn btn-secondary">Login</router-link>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const fullName = ref('')
 const email = ref('')
@@ -81,6 +97,9 @@ const passwordError = ref(false)
 const confirmPasswordError = ref(false)
 const errorMessage = ref('')
 
+const passwordStrong = computed(() =>
+  /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(password.value)
+)
 
 const handleRegister = () => {
 
@@ -105,7 +124,7 @@ const handleRegister = () => {
   if (!agreeTerms.value) {
     errorMessage.value = 'You must agree to the terms.'
   }
-
+   const hasStrengthIssue = Boolean(password.value && !passwordStrong.value)
 
   if (
     fullNameError.value ||
@@ -119,7 +138,7 @@ const handleRegister = () => {
 
 
   console.log('Registration successful')
-  // 可以在这里提交数据到后端，例如通过 API 注册用户
+  
 }
 
 
@@ -127,6 +146,8 @@ const validateEmail = (email) => {
   const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return regex.test(email);
 }
+
+
 </script>
 
 <style scoped>
