@@ -2,13 +2,28 @@
   <div class="loginpage">
     <div class="card">
       <h2 class="title">Community Gym Login</h2>
+      <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
 
       <form @submit.prevent="handleLogin">
         <div class="form-group">
-          <input type="text" placeholder="Username" />
+          <input
+            v-model="username"
+            type="text"
+            placeholder="Username"
+            :class="{'input-error': usernameError}"
+            required
+          />
+          <span v-if="usernameError" class="error-text">Username is required</span>
         </div>
         <div class="form-group">
-          <input type="password" placeholder="Password" />
+          <input
+            v-model="password"
+            type="password"
+            placeholder="Password"
+            :class="{'input-error': passwordError}"
+            required
+          />
+          <span v-if="passwordError" class="error-text">Password is required</span>
         </div>
         <button type="submit" class="btn">Login</button>
       </form>
@@ -24,10 +39,12 @@
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
-function handleLogin() {
+function handleLoginn() {
   
   router.push('/main')
 }
+
+
 </script>
 
 <style scoped>

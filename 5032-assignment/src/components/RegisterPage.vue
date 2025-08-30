@@ -3,28 +3,57 @@
   <div class="registerpage">
     <div class="card">
       <h2 class="title">Create Your Gym Account</h2>
-
-      <form>
+      <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+      <form @submit.prevent="handleRegister" >
         <div class="form-group">
-          <input type="text" placeholder="Full name" />
+          <input
+            v-model="fullName"
+            type="text"
+            placeholder="Full name"
+            :class="{'input-error': fullNameError}"
+            required
+          />
+          <span v-if="fullNameError" class="error-text">Full name is required</span>
         </div>
 
         <div class="form-group">
-          <input type="email" placeholder="Email" />
+          <input
+            v-model="email"
+            type="email"
+            placeholder="Email"
+            :class="{'input-error': emailError}"
+            required
+          />
+          <span v-if="emailError" class="error-text">Valid email is required</span>
         </div>
 
         <div class="form-group">
-          <input type="password" placeholder="Password" />
+          <input
+            v-model="password"
+            type="password"
+            placeholder="Password"
+            :class="{'input-error': passwordError}"
+            required
+          />
+          <span v-if="passwordError" class="error-text">Password is required</span>
         </div>
 
         <div class="form-group">
-          <input type="password" placeholder="Confirm password" />
+          <input
+            v-model="confirmPassword"
+            type="password"
+            placeholder="Confirm password"
+            :class="{'input-error': confirmPasswordError}"
+            required
+          />
+          <span v-if="confirmPasswordError" class="error-text">Passwords must match</span>
         </div>
 
         <label class="agree">
-          <input type="checkbox" />
+          <input v-model="agreeTerms" type="checkbox" />
           <span>I agree to the Terms</span>
         </label>
+        <span v-if="!agreeTerms" class="error-text">You must agree to the terms</span>
 
         <button type="submit" class="btn">Create account</button>
       </form>
@@ -38,7 +67,66 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 
+const fullName = ref('')
+const email = ref('')
+const password = ref('')
+const confirmPassword = ref('')
+const agreeTerms = ref(false)
+
+const fullNameError = ref(false)
+const emailError = ref(false)
+const passwordError = ref(false)
+const confirmPasswordError = ref(false)
+const errorMessage = ref('')
+
+
+const handleRegister = () => {
+
+  fullNameError.value = false
+  emailError.value = false
+  passwordError.value = false
+  confirmPasswordError.value = false
+  errorMessage.value = ''
+
+  if (!fullName.value) {
+    fullNameError.value = true
+  }
+  if (!email.value || !validateEmail(email.value)) {
+    emailError.value = true
+  }
+  if (!password.value) {
+    passwordError.value = true
+  }
+  if (password.value !== confirmPassword.value) {
+    confirmPasswordError.value = true
+  }
+  if (!agreeTerms.value) {
+    errorMessage.value = 'You must agree to the terms.'
+  }
+
+
+  if (
+    fullNameError.value ||
+    emailError.value ||
+    passwordError.value ||
+    confirmPasswordError.value ||
+    errorMessage.value
+  ) {
+    return
+  }
+
+
+  console.log('Registration successful')
+  // 可以在这里提交数据到后端，例如通过 API 注册用户
+}
+
+
+const validateEmail = (email) => {
+  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return regex.test(email);
+}
 </script>
 
 <style scoped>
