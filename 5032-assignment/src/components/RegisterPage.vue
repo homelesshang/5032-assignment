@@ -137,7 +137,6 @@ const handleRegister = () => {
   }
 
 
-  console.log('Registration successful')
   
 }
 

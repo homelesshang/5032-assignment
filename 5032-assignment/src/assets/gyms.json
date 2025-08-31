@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "City Gym",
+    "suburb": "CBD",
+    "amenities": ["Sauna", "Pool"],
+    "open": "06:00",
+    "close": "22:00"
+  },
+  {
+    "id": 2,
+    "name": "North Fit",
+    "suburb": "Carlton",
+    "amenities": ["PT", "Yoga"],
+    "open": "06:00",
+    "close": "21:00"
+  },
+  {
+    "id": 3,
+    "name": "South Strength",
+    "suburb": "St Kilda",
+    "amenities": ["Weights", "Pilates"],
+    "open": "05:30",
+    "close": "22:30"
+  }
+]
