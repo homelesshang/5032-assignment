@@ -65,7 +65,7 @@ const signin = () => {
 
   if (emailError.value || passwordError.value) return
 
-  signInWithEmailAndPassword(auth, email.value, password.value)
+  signInWithEmailAndPassword(auth, email.value, password.value.trim())
     .then((data) => {
       console.log("Firebase Login Successful!", data.user?.uid)
       
