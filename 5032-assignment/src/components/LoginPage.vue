@@ -7,18 +7,18 @@
 
         <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
-        <form @submit.prevent="handleLogin" novalidate>
-          <!-- Username -->
+        <form @submit.prevent="signin" novalidate>
+          <!-- email -->
           <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
+            <label for="email" class="form-label">Email</label>
             <input
-              id="username"
-              v-model="username"
+              id="email"
+              v-model="email"
               type="text"
               class="form-control"
-              :class="{'is-invalid': usernameError}"
+              :class="{'is-invalid': emailError}"
             />
-            <div v-if="usernameError" class="invalid-feedback">Username is required</div>
+            <div v-if="emailError" class="invalid-feedback">Email is required</div>
           </div>
 
           <!-- Password -->
@@ -45,13 +45,42 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 const router = useRouter()
+const auth = getAuth()
 
-function handleLogin() {
-  
-  router.push('/main')
+const email = ref('')
+const password = ref('')
+
+const emailError = ref(false)
+const passwordError = ref(false)
+const errorMessage = ref('')
+
+const signin = () => {
+  emailError.value = !email.value
+  passwordError.value = !password.value
+  errorMessage.value = ''
+
+  if (emailError.value || passwordError.value) return
+
+  signInWithEmailAndPassword(auth, email.value, password.value)
+    .then((data) => {
+      console.log("Firebase Login Successful!", data.user?.uid)
+      
+      router.push("/main")
+      
+      console.log("Current User:", auth.currentUser)
+    })
+    .catch((error) => {
+      console.log("Login error:", error.code, error.message)
+      errorMessage.value = error.message
+    })
 }
+
+
+
 
 
 </script>

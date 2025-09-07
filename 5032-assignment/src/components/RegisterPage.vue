@@ -84,6 +84,13 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore'
+
+const router = useRouter()
+const auth = getAuth()
+const db = getFirestore()
 
 const fullName = ref('')
 const email = ref('')
@@ -137,7 +144,7 @@ const handleRegister = () => {
   }
 
 
-  
+  register()
 }
 
 
@@ -146,6 +153,19 @@ const validateEmail = (email) => {
   return regex.test(email);
 }
 
+const register = () => {
+  errorMessage.value = ""
+  createUserWithEmailAndPassword(auth, email.value.trim(), password.value)
+    .then((data) => {
+      console.log("Firebase Register Successful!", data.user?.uid)
+      router.push("/login") 
+    })
+    .catch((error) => {
+      console.log(error.code, error.message)
+      errorMessage.value = error.message
+      
+    })
+}
 
 </script>
 
