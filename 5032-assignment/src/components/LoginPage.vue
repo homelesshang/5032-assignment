@@ -65,11 +65,19 @@ const signin = () => {
 
   if (emailError.value || passwordError.value) return
 
-  signInWithEmailAndPassword(auth, email.value, password.value.trim())
+  signInWithEmailAndPassword(auth, email.value.trim(), password.value.trim())
     .then((data) => {
       console.log("Firebase Login Successful!", data.user?.uid)
-      
-      router.push("/main")
+      const foundUser = mockUsers.find(u => u.email === email.value.trim())
+      const role = foundUser ? foundUser.role : "client" 
+      localStorage.setItem("role", role)
+      localStorage.setItem("email", email.value.trim())
+      if (role === "coach") {
+        router.push("/coach")
+      } else {
+        router.push("/client")
+      }
+
       
       console.log("Current User:", auth.currentUser)
     })
@@ -80,7 +88,10 @@ const signin = () => {
 }
 
 
-
+const mockUsers = [
+  { email: "coach@gym.com", password: "Coach123", role: "coach" },
+  { email: "client@gym.com", password: "Client123", role: "client" }
+]
 
 
 </script>
