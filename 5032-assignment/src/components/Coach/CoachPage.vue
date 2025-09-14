@@ -10,13 +10,18 @@
       </p>
       <p v-else>No ratings yet</p>
     </div>
+
+    <div class="mt-4">
+      <button class="btn btn-secondary" @click="goBack">← Back to Login</button>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue"
-
+import { useRouter } from "vue-router"
 const avgRating = ref(null)
+const router = useRouter()
 
 onMounted(() => {
   const saved = localStorage.getItem("clientRating")
@@ -24,4 +29,11 @@ onMounted(() => {
     avgRating.value = parseInt(saved)
   }
 })
+
+const goBack = () => {
+  
+  localStorage.removeItem("role")
+  localStorage.removeItem("email")
+  router.push("/login")
+}
 </script>

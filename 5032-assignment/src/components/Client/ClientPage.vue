@@ -18,14 +18,18 @@
       <p v-if="myRating">You rated: {{ myRating }}/5</p>
       <p v-else>No rating yet</p>
     </div>
+
+    <div class="mt-4">
+      <button class="btn btn-secondary" @click="goBack">← Back to Login</button>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue"
-
+import { useRouter } from "vue-router"
 const myRating = ref(0)
-
+const router = useRouter()
 onMounted(() => {
   const saved = localStorage.getItem("clientRating")
   if (saved) myRating.value = parseInt(saved)
@@ -34,6 +38,12 @@ onMounted(() => {
 const rate = (score) => {
   myRating.value = score
   localStorage.setItem("clientRating", score)
+}
+
+const goBack = () => {
+  localStorage.removeItem("role")
+  localStorage.removeItem("email")
+  router.push("/login")
 }
 </script>
 
