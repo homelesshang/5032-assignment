@@ -8,7 +8,7 @@
         <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
         <form @submit.prevent="signin" novalidate>
-          <!-- email -->
+          <!-- Email -->
           <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input
@@ -16,7 +16,7 @@
               v-model="email"
               type="text"
               class="form-control"
-              :class="{'is-invalid': emailError}"
+              :class="{ 'is-invalid': emailError }"
             />
             <div v-if="emailError" class="invalid-feedback">Email is required</div>
           </div>
@@ -29,7 +29,7 @@
               v-model="password"
               type="password"
               class="form-control"
-              :class="{'is-invalid': passwordError}"
+              :class="{ 'is-invalid': passwordError }"
             />
             <div v-if="passwordError" class="invalid-feedback">Password is required</div>
           </div>
@@ -48,52 +48,59 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import { getFirestore, doc, getDoc } from 'firebase/firestore'
+
 const router = useRouter()
 const auth = getAuth()
+const db = getFirestore()
 
 const email = ref('')
 const password = ref('')
-
 const emailError = ref(false)
 const passwordError = ref(false)
 const errorMessage = ref('')
 
-const signin = () => {
+const signin = async () => {
+
   emailError.value = !email.value
   passwordError.value = !password.value
   errorMessage.value = ''
 
   if (emailError.value || passwordError.value) return
 
-  signInWithEmailAndPassword(auth, email.value.trim(), password.value.trim())
-    .then((data) => {
-      console.log("Firebase Login Successful!", data.user?.uid)
-      const foundUser = mockUsers.find(u => u.email === email.value.trim())
-      const role = foundUser ? foundUser.role : "client" 
-      localStorage.setItem("role", role)
-      localStorage.setItem("email", email.value.trim())
-      if (role === "coach") {
-        router.push("/coach")
-      } else {
-        router.push("/client")
-      }
+  try {
+    
+    const userCredential = await signInWithEmailAndPassword(auth, email.value.trim(), password.value.trim())
+    const user = userCredential.user
+    console.log("✅ Firebase Login Successful:", user.uid)
+
+
+    const userDocRef = doc(db, "users", user.uid)
+    const userDoc = await getDoc(userDocRef)
+
+    if (userDoc.exists()) {
+      const userData = userDoc.data()
+      const role = userData.role || 'client' // 默认client
+
+
 
       
-      console.log("Current User:", auth.currentUser)
-    })
-    .catch((error) => {
-      console.log("Login error:", error.code, error.message)
-      errorMessage.value = error.message
-    })
+      if (role === "coach") {
+        router.push("/coach-dashboard")
+      } else {
+        router.push("/client-dashboard")
+      }
+
+      console.log("🎯 Logged in as:", role)
+    } else {
+      errorMessage.value = "User data not found in Firestore."
+    }
+
+  } catch (error) {
+    console.log("❌ Login error:", error.code, error.message)
+    errorMessage.value = error.message
+  }
 }
-
-
-const mockUsers = [
-  { email: "coach@gym.com", password: "Coach123", role: "coach" },
-  { email: "client@gym.com", password: "Client123", role: "client" }
-]
-
-
 </script>
 
 <style scoped>

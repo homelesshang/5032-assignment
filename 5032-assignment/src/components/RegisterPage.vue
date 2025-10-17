@@ -1,67 +1,60 @@
-<!-- src/pages/RegisterPage.vue -->
+<!-- RegisterPage.vue -->
 <template>
   <div class="container my-5">
     <div class="row justify-content-center">
       <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 col-xxl-4">
         <h2 class="text-center mb-4">Create Your Gym Account</h2>
 
-       
         <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
         <form @submit.prevent="handleRegister" novalidate>
           <!-- Full name -->
           <div class="mb-3">
             <label for="fullName" class="form-label">Full name</label>
-            <input
-              id="fullName"
-              v-model="fullName"
-              type="text"
-              class="form-control"
-              :class="{'is-invalid': fullNameError}"
-            />
-            <div v-if="fullNameError" class="invalid-feedback">Full name is required</div>
+            <input id="fullName" v-model="fullName" type="text" class="form-control" />
           </div>
 
           <!-- Email -->
           <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input
-              id="email"
-              v-model="email"
-              type="email"
-              class="form-control"
-              :class="{'is-invalid': emailError}"
-            />
-            <div v-if="emailError" class="invalid-feedback">Valid email is required</div>
+            <input id="email" v-model="email" type="email" class="form-control" />
           </div>
 
           <!-- Password -->
           <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input
-              id="password"
-              v-model="password"
-              type="password"
-              class="form-control"
-              :class="{ 'is-invalid': passwordError || (password && !passwordStrong) }"
-            />
-            <div v-if="passwordError" class="invalid-feedback">Password is required</div>
-            <div v-else-if="password && !passwordStrong" class="invalid-feedback">
-              Password must be at least 8 characters and include letters and numbers
-            </div>
+            <input id="password" v-model="password" type="password" class="form-control" />
           </div>
 
-          <!-- Confirm password -->
+          <!-- Confirm Password -->
           <div class="mb-3">
-            <label for="confirmPassword" class="form-label">Confirm password</label>
-            <input
-              id="confirmPassword"
-              v-model="confirmPassword"
-              type="password"
-              class="form-control"
-              :class="{'is-invalid': confirmPasswordError}"
-            />
-            <div v-if="confirmPasswordError" class="invalid-feedback">Passwords must match</div>
+            <label for="confirmPassword" class="form-label">Confirm Password</label>
+            <input id="confirmPassword" v-model="confirmPassword" type="password" class="form-control" />
+          </div>
+
+          <!-- ✅ Role selection -->
+          <div class="mb-3">
+            <label class="form-label">Select Role</label>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                id="roleClient"
+                value="client"
+                v-model="role"
+              />
+              <label class="form-check-label" for="roleClient">Client</label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                id="roleCoach"
+                value="coach"
+                v-model="role"
+              />
+              <label class="form-check-label" for="roleCoach">Coach</label>
+            </div>
           </div>
 
           <!-- Terms -->
@@ -69,12 +62,9 @@
             <input id="agreeTerms" v-model="agreeTerms" type="checkbox" class="form-check-input" />
             <label for="agreeTerms" class="form-check-label">I agree to the Terms</label>
           </div>
-          <div v-if="!agreeTerms" class="text-danger small">You must agree to the terms</div>
 
-          <!-- Buttons -->
           <div class="text-center">
-            <button type="submit" class="btn btn-primary me-2">Create account</button>
-            <router-link to="/login" class="btn btn-secondary">Login</router-link>
+            <button type="submit" class="btn btn-primary">Create Account</button>
           </div>
         </form>
       </div>
@@ -83,90 +73,49 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { ref } from "vue"
+import { useRouter } from "vue-router"
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
+import { getFirestore, doc, setDoc, serverTimestamp } from "firebase/firestore"
 
 const router = useRouter()
 const auth = getAuth()
 const db = getFirestore()
 
-const fullName = ref('')
-const email = ref('')
-const password = ref('')
-const confirmPassword = ref('')
+const fullName = ref("")
+const email = ref("")
+const password = ref("")
+const confirmPassword = ref("")
+const role = ref("") 
 const agreeTerms = ref(false)
+const errorMessage = ref("")
 
-const fullNameError = ref(false)
-const emailError = ref(false)
-const passwordError = ref(false)
-const confirmPasswordError = ref(false)
-const errorMessage = ref('')
-
-const passwordStrong = computed(() =>
-  /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(password.value)
-)
-
-const handleRegister = () => {
-
-  fullNameError.value = false
-  emailError.value = false
-  passwordError.value = false
-  confirmPasswordError.value = false
-  errorMessage.value = ''
-
-  if (!fullName.value) {
-    fullNameError.value = true
-  }
-  if (!email.value || !validateEmail(email.value)) {
-    emailError.value = true
-  }
-  if (!password.value) {
-    passwordError.value = true
-  }
-  if (password.value !== confirmPassword.value) {
-    confirmPasswordError.value = true
-  }
-  if (!agreeTerms.value) {
-    errorMessage.value = 'You must agree to the terms.'
-  }
-   const hasStrengthIssue = Boolean(password.value && !passwordStrong.value)
-
-  if (
-    fullNameError.value ||
-    emailError.value ||
-    passwordError.value ||
-    confirmPasswordError.value ||
-    errorMessage.value
-  ) {
+const handleRegister = async () => {
+  if (!fullName.value || !email.value || !password.value || password.value !== confirmPassword.value || !agreeTerms.value || !role.value) {
+    errorMessage.value = "Please fill all fields correctly."
     return
   }
 
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value)
+    const user = userCredential.user
 
-  register()
-}
+    await updateProfile(user, { displayName: fullName.value })
 
-
-const validateEmail = (email) => {
-  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  return regex.test(email);
-}
-
-const register = () => {
-  errorMessage.value = ""
-  createUserWithEmailAndPassword(auth, email.value.trim(), password.value)
-    .then((data) => {
-      console.log("Firebase Register Successful!", data.user?.uid)
-      router.push("/login") 
+    
+    await setDoc(doc(db, "users", user.uid), {
+      fullName: fullName.value,
+      email: email.value,
+      role: role.value,
+      createdAt: serverTimestamp(),
     })
-    .catch((error) => {
-      console.log(error.code, error.message)
-      errorMessage.value = error.message
-      
-    })
-}
 
+    alert("Account created successfully! Please log in.")
+    router.push("/login")
+  } catch (error) {
+    errorMessage.value = error.message
+  }
+}
 </script>
 
 <style scoped>
