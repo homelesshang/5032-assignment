@@ -2,7 +2,6 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-
 let devToolsPlugin = []
 
 if (process.env.NODE_ENV === 'development') {
@@ -24,5 +23,11 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
+  },
+ 
+  preview: {
+    host: '0.0.0.0',
+    port: 10000,
+    allowedHosts: ['https://five032-assignment.onrender.com'], 
   },
 })
