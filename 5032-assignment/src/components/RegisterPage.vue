@@ -77,6 +77,7 @@ import { ref } from "vue"
 import { useRouter } from "vue-router"
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import { getFirestore, doc, setDoc, serverTimestamp } from "firebase/firestore"
+import { getFunctions, httpsCallable } from "firebase/functions"
 
 const router = useRouter()
 const auth = getAuth()
@@ -89,6 +90,9 @@ const confirmPassword = ref("")
 const role = ref("") 
 const agreeTerms = ref(false)
 const errorMessage = ref("")
+const functions = getFunctions()
+const sendEmailFn = httpsCallable(functions, "sendEmailWithAttachment")
+
 
 const handleRegister = async () => {
   if (!fullName.value || !email.value || !password.value || password.value !== confirmPassword.value || !agreeTerms.value || !role.value) {
@@ -109,6 +113,14 @@ const handleRegister = async () => {
       role: role.value,
       createdAt: serverTimestamp(),
     })
+
+    await sendEmailFn({
+      to: email.value,
+      subject: "Welcome to Community Gym!",
+      message: `Hi ${fullName.value}, welcome to the Community Gym! Your role is ${role.value}. Please find the attached CSV guide.`,
+    })
+
+    console.log("📧 Welcome email sent successfully!")
 
     alert("Account created successfully! Please log in.")
     router.push("/login")
