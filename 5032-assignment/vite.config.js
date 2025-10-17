@@ -28,6 +28,6 @@ export default defineConfig({
   preview: {
     host: '0.0.0.0',
     port: 10000,
-    allowedHosts: ['https://five032-assignment.onrender.com'], 
+    allowedHosts: ['five032-assignment.onrender.com'], 
   },
 })
