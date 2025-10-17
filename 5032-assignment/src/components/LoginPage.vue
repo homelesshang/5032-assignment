@@ -86,9 +86,9 @@ const signin = async () => {
 
       
       if (role === "coach") {
-        router.push("/coach-dashboard")
+        router.push("/coach")
       } else {
-        router.push("/client-dashboard")
+        router.push("/client")
       }
 
       console.log("🎯 Logged in as:", role)
