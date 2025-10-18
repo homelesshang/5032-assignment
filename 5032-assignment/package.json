@@ -17,6 +17,7 @@
     "@primeuix/themes": "^1.2.5",
     "@primevue/themes": "^4.3.7",
     "bootstrap": "^5.3.8",
+    "chart.js": "^4.5.1",
     "firebase": "^12.4.0",
     "primeicons": "^7.0.0",
     "primevue": "^4.4.1",
