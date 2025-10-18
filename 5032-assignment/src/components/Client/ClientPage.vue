@@ -25,9 +25,12 @@
             <li class="nav-item">
               <router-link class="nav-link px-3 fs-5" to="/client">🏠 Dashboard</router-link>
             </li>
+
+            <!-- ✅ 改为 /classes 页面 -->
             <li class="nav-item">
-              <router-link class="nav-link px-3 fs-5" to="/main">📋 Classes</router-link>
+              <router-link class="nav-link px-3 fs-5" to="/classes">📋 Classes</router-link>
             </li>
+
             <li class="nav-item">
               <router-link class="nav-link px-3 fs-5" to="/map">🧭 Map</router-link>
             </li>
@@ -49,9 +52,11 @@
       <h2>Welcome Client</h2>
       <p>You can view available gym classes and rate them.</p>
 
-      <div class="card mt-4 p-3">
+      <!-- 用户评分卡片 -->
+      <div class="card mt-4 p-3 shadow-sm">
         <h4>Fitness Class: Yoga Training</h4>
         <p>Please rate this class:</p>
+
         <div>
           <span
             v-for="n in 5"
@@ -61,12 +66,19 @@
             @click="rate(n)"
           >★</span>
         </div>
+
         <p v-if="myRating">You rated: {{ myRating }}/5</p>
         <p v-else>No rating yet</p>
       </div>
 
-      <div class="mt-4">
+      <!-- 底部按钮区 -->
+      <div class="mt-4 d-flex justify-content-between">
         <button class="btn btn-secondary" @click="goBack">← Back to Login</button>
+
+        <!-- ✅ 新增“查看课程”快捷按钮 -->
+        <router-link to="/classes" class="btn btn-primary">
+          💪 View All Classes
+        </router-link>
       </div>
     </div>
   </div>
@@ -85,12 +97,13 @@ onMounted(() => {
   if (saved) myRating.value = parseInt(saved)
 })
 
+// ⭐ 点击评分
 const rate = (score) => {
   myRating.value = score
   localStorage.setItem("clientRating", score)
 }
 
-// ✅ 登出按钮
+// 🚪 登出逻辑
 const logout = async () => {
   const auth = getAuth()
   await signOut(auth)
@@ -98,6 +111,7 @@ const logout = async () => {
   router.push("/login")
 }
 
+// 🔙 返回登录
 const goBack = () => {
   localStorage.clear()
   router.push("/login")
@@ -105,36 +119,26 @@ const goBack = () => {
 </script>
 
 <style scoped>
+/* 星星评分样式 */
 .star {
   font-size: 2rem;
   color: gray;
   cursor: pointer;
-}
-.star.active {
-  color: orange;
-}
-</style>
-
-<style scoped>
-.star {
-  font-size: 30px;
-  cursor: pointer;
-  color: grey;
+  transition: color 0.2s;
 }
 .star.active {
   color: orange;
 }
 
+/* 导航样式 */
 .navbar-nav .nav-link {
   transition: color 0.2s, background-color 0.2s;
   border-radius: 10px;
 }
-
 .navbar-nav .nav-link:hover {
   background-color: rgba(255, 255, 255, 0.15);
   color: #fff !important;
 }
-
 .navbar {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   letter-spacing: 0.5px;

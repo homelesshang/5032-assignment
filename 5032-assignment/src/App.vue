@@ -4,7 +4,7 @@ import LoginPage from './components/LoginPage.vue'
 </script>
 
 <template>
-  <router-view />
+  <router-view :key="$route.fullPath" />
 </template>
 
 <style scoped>
