@@ -26,7 +26,7 @@
               <router-link class="nav-link px-3 fs-5" to="/coach">🏠 Dashboard</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link px-3 fs-5" to="/classes">📋 Manage Classes</router-link>
+              <router-link class="nav-link px-3 fs-5" to="/coach/progress">📊 Progress</router-link>
             </li>
             <li class="nav-item">
               <router-link class="nav-link px-3 fs-5" to="/map">🧭 Map</router-link>

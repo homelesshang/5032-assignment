@@ -7,6 +7,7 @@ import RegisterPage from '../components/RegisterPage.vue'
 import CoachPage from '../components/Coach/CoachPage.vue'
 import ClientPage from '../components/Client/ClientPage.vue'
 import ClientClasses from '../components/Client/ClientClasses.vue'
+import CoachProgress from '../components/Coach/CoachProgress.vue'
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -36,6 +37,12 @@ const routes = [
     component: ClientClasses,
     meta: { requiresRole: 'client' },
   },
+  {
+  path: '/coach/progress',
+  name: 'coachProgress',
+  component: CoachProgress,
+  meta: { requiresRole: 'coach' }
+  }
 ]
 
 const router = createRouter({
