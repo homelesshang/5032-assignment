@@ -2,18 +2,21 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { getFirestore, doc, getDoc } from 'firebase/firestore'
 
-
 import LoginPage from '../components/LoginPage.vue'
 import RegisterPage from '../components/RegisterPage.vue'
 import MainPage from '../components/MainPage.vue'
 import CoachPage from '../components/Coach/CoachPage.vue'
 import ClientPage from '../components/Client/ClientPage.vue'
 
+
+import ClientClasses from '../components/Client/ClientClasses.vue'
+
 const routes = [
   { path: '/', redirect: '/login' },
   { path: '/login', name: 'login', component: LoginPage },
   { path: '/register', name: 'register', component: RegisterPage },
   { path: '/main', name: 'main', component: MainPage },
+
   {
     path: '/coach',
     name: 'coach',
@@ -25,6 +28,14 @@ const routes = [
     name: 'client',
     component: ClientPage,
     meta: { requiresRole: 'client' }
+  },
+
+
+  {
+    path: '/classes',
+    name: 'clientClasses',
+    component: ClientClasses,
+    meta: { requiresRole: 'client' } 
   }
 ]
 
@@ -58,7 +69,7 @@ router.beforeEach(async (to, from, next) => {
       const role = userDoc.exists() ? userDoc.data().role : null
 
       if (role === to.meta.requiresRole) {
-        return next() 
+        return next()
       } else {
         alert("⛔ No permission to access this page.")
         return next('/login')
@@ -70,7 +81,7 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
- 
+  // 默认放行
   next()
 })
 
