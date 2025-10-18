@@ -32,11 +32,9 @@
             </li>
 
             <li class="nav-item">
-              <router-link class="nav-link px-3 fs-5" to="/map">🧭 Map</router-link>
+              <router-link class="nav-link px-3 fs-5" to="/customer-map">🧭 Map</router-link>
             </li>
-            <li class="nav-item">
-              <router-link class="nav-link px-3 fs-5" to="/export">📤 Export</router-link>
-            </li>
+            
           </ul>
 
           <!-- 右侧登出 -->

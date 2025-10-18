@@ -8,6 +8,7 @@ import CoachPage from '../components/Coach/CoachPage.vue'
 import ClientPage from '../components/Client/ClientPage.vue'
 import ClientClasses from '../components/Client/ClientClasses.vue'
 import CoachProgress from '../components/Coach/CoachProgress.vue'
+import CustomerMap from '../components/Client/CustomerMap.vue'
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -37,12 +38,22 @@ const routes = [
     component: ClientClasses,
     meta: { requiresRole: 'client' },
   },
+
+  // 🗺️ 顾客地图页面（新加的）
   {
-  path: '/coach/progress',
-  name: 'coachProgress',
-  component: CoachProgress,
-  meta: { requiresRole: 'coach' }
-  }
+    path: '/customer-map',
+    name: 'customerMap',
+    component: CustomerMap,
+    meta: { requiresRole: 'client' },
+  },
+
+  // 📈 教练进度页面
+  {
+    path: '/coach/progress',
+    name: 'coachProgress',
+    component: CoachProgress,
+    meta: { requiresRole: 'coach' },
+  },
 ]
 
 const router = createRouter({
@@ -50,19 +61,13 @@ const router = createRouter({
   routes,
 })
 
-/**
- * ✅ 修正版导航守卫
- * 解决重复 next() 导致页面空白的问题
- * 更清晰的流程控制 + 调试日志
- */
+// ✅ 导航守卫（无需修改）
 router.beforeEach(async (to, from, next) => {
   const auth = getAuth()
   const db = getFirestore()
 
-  // 如果页面不需要验证权限 → 直接放行
   if (!to.meta.requiresRole) return next()
 
-  // 等待 Firebase 获取当前登录状态
   const user = await new Promise((resolve) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       unsubscribe()
@@ -70,7 +75,6 @@ router.beforeEach(async (to, from, next) => {
     })
   })
 
-  // 🚫 未登录
   if (!user) {
     alert('⚠️ Please login first.')
     return next('/login')
@@ -81,13 +85,11 @@ router.beforeEach(async (to, from, next) => {
     const role = userDoc.exists() ? userDoc.data().role : null
     console.log('👤 Current user role:', role)
 
-    // 🚫 权限不匹配
     if (to.meta.requiresRole && role !== to.meta.requiresRole) {
       alert('⛔ No permission to access this page.')
       return next('/login')
     }
 
-    // ✅ 验证通过
     next()
   } catch (err) {
     console.error('🔥 Error checking role:', err)
