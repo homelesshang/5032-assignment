@@ -3,41 +3,33 @@
     <!-- ✅ 顶部导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
       <div class="container-fluid px-5">
-        <!-- 左侧 Logo -->
         <a class="navbar-brand fw-bold fs-4 text-white" href="#">🏋️ Community Gym</a>
 
-        <!-- 手机端折叠菜单按钮 -->
         <button
           class="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
         >
           <span class="navbar-toggler-icon"></span>
         </button>
 
-        <!-- 菜单项 -->
         <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <router-link class="nav-link px-3 fs-5" to="/client">🏠 Dashboard</router-link>
+              <router-link class="nav-link px-3 fs-5 active" to="/client">🏠 Dashboard</router-link>
             </li>
-
-            <!-- ✅ 改为 /classes 页面 -->
             <li class="nav-item">
               <router-link class="nav-link px-3 fs-5" to="/classes">📋 Classes</router-link>
             </li>
-
             <li class="nav-item">
               <router-link class="nav-link px-3 fs-5" to="/customer-map">🧭 Map</router-link>
             </li>
-            
+            <li class="nav-item">
+              <router-link class="nav-link px-3 fs-5" to="/rating">⭐ Rate Coach</router-link>
+            </li>
           </ul>
 
-          <!-- 右侧登出 -->
           <button class="btn btn-outline-light btn-lg px-4" @click="logout">
             Logout
           </button>
@@ -45,39 +37,48 @@
       </div>
     </nav>
 
-    <!-- ✅ 页面主体部分 -->
-    <div class="container mt-5">
-      <h2>Welcome Client</h2>
-      <p>You can view available gym classes and rate them.</p>
+    <!-- ✅ 主页面内容 -->
+    <div class="dashboard container mt-5 text-center">
+      <h2 class="fw-bold mb-3">Welcome back, {{ userName || "Guest" }}! 👋</h2>
+      <p class="text-muted mb-4">
+        Manage your fitness journey, explore classes, find gyms, and rate your coaches — all in one place.
+      </p>
 
-      <!-- 用户评分卡片 -->
-      <div class="card mt-4 p-3 shadow-sm">
-        <h4>Fitness Class: Yoga Training</h4>
-        <p>Please rate this class:</p>
-
-        <div>
-          <span
-            v-for="n in 5"
-            :key="n"
-            class="star"
-            :class="{ active: n <= myRating }"
-            @click="rate(n)"
-          >★</span>
+      <div class="row justify-content-center mt-4">
+        <!-- 📋 Classes -->
+        <div class="col-md-3 mb-3">
+          <div class="card shadow-lg option-card" @click="goTo('/classes')">
+            <div class="card-body">
+              <h4>📋 View Classes</h4>
+              <p class="text-muted">Explore available fitness programs.</p>
+            </div>
+          </div>
         </div>
 
-        <p v-if="myRating">You rated: {{ myRating }}/5</p>
-        <p v-else>No rating yet</p>
+        <!-- 🧭 Map -->
+        <div class="col-md-3 mb-3">
+          <div class="card shadow-lg option-card" @click="goTo('/customer-map')">
+            <div class="card-body">
+              <h4>🧭 Find Gyms</h4>
+              <p class="text-muted">Locate gyms around your area.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⭐ Rate -->
+        <div class="col-md-3 mb-3">
+          <div class="card shadow-lg option-card" @click="goTo('/rating')">
+            <div class="card-body">
+              <h4>⭐ Rate Coaches</h4>
+              <p class="text-muted">Share your feedback with us.</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- 底部按钮区 -->
-      <div class="mt-4 d-flex justify-content-between">
-        <button class="btn btn-secondary" @click="goBack">← Back to Login</button>
-
-        <!-- ✅ 新增“查看课程”快捷按钮 -->
-        <router-link to="/classes" class="btn btn-primary">
-          💪 View All Classes
-        </router-link>
-      </div>
+      <p class="text-secondary mt-4">
+        💪 Stay motivated — your consistency is your superpower!
+      </p>
     </div>
   </div>
 </template>
@@ -87,21 +88,19 @@ import { ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { getAuth, signOut } from "firebase/auth"
 
-const myRating = ref(0)
 const router = useRouter()
+const userName = ref("")
 
+// ✅ 获取当前用户信息
 onMounted(() => {
-  const saved = localStorage.getItem("clientRating")
-  if (saved) myRating.value = parseInt(saved)
+  const auth = getAuth()
+  if (auth.currentUser) {
+    const email = auth.currentUser.email
+    userName.value = email ? email.split("@")[0] : "User"
+  }
 })
 
-// ⭐ 点击评分
-const rate = (score) => {
-  myRating.value = score
-  localStorage.setItem("clientRating", score)
-}
-
-// 🚪 登出逻辑
+// ✅ 登出功能
 const logout = async () => {
   const auth = getAuth()
   await signOut(auth)
@@ -109,26 +108,14 @@ const logout = async () => {
   router.push("/login")
 }
 
-// 🔙 返回登录
-const goBack = () => {
-  localStorage.clear()
-  router.push("/login")
+// ✅ 跳转函数
+function goTo(path) {
+  router.push(path)
 }
 </script>
 
 <style scoped>
-/* 星星评分样式 */
-.star {
-  font-size: 2rem;
-  color: gray;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-.star.active {
-  color: orange;
-}
-
-/* 导航样式 */
+/* ✅ 导航栏样式 */
 .navbar-nav .nav-link {
   transition: color 0.2s, background-color 0.2s;
   border-radius: 10px;
@@ -138,7 +125,34 @@ const goBack = () => {
   color: #fff !important;
 }
 .navbar {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   letter-spacing: 0.5px;
+}
+
+/* ✅ Dashboard 内容样式 */
+.dashboard {
+  animation: fadeIn 0.8s ease-in-out;
+}
+.option-card {
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.option-card:hover {
+  transform: scale(1.05);
+  background-color: #f8f9fa;
+}
+.option-card h4 {
+  font-weight: 600;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>
