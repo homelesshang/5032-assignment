@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- ✅ 顶部导航栏 -->
+ 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
       <div class="container-fluid px-5">
         <a class="navbar-brand fw-bold fs-4 text-white" href="#">🏋️ Community Gym</a>
@@ -37,7 +37,7 @@
       </div>
     </nav>
 
-    <!-- ✅ 主页面内容 -->
+
     <div class="dashboard container mt-5 text-center">
       <h2 class="fw-bold mb-3">Welcome back, {{ userName || "Guest" }}! 👋</h2>
       <p class="text-muted mb-4">
@@ -91,7 +91,7 @@ import { getAuth, signOut } from "firebase/auth"
 const router = useRouter()
 const userName = ref("")
 
-// ✅ 获取当前用户信息
+
 onMounted(() => {
   const auth = getAuth()
   if (auth.currentUser) {
@@ -100,7 +100,7 @@ onMounted(() => {
   }
 })
 
-// ✅ 登出功能
+
 const logout = async () => {
   const auth = getAuth()
   await signOut(auth)
@@ -108,14 +108,14 @@ const logout = async () => {
   router.push("/login")
 }
 
-// ✅ 跳转函数
+
 function goTo(path) {
   router.push(path)
 }
 </script>
 
 <style scoped>
-/* ✅ 导航栏样式 */
+
 .navbar-nav .nav-link {
   transition: color 0.2s, background-color 0.2s;
   border-radius: 10px;
@@ -129,7 +129,7 @@ function goTo(path) {
   letter-spacing: 0.5px;
 }
 
-/* ✅ Dashboard 内容样式 */
+
 .dashboard {
   animation: fadeIn 0.8s ease-in-out;
 }

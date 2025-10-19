@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- ✅ 顶部导航栏 -->
+    
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
       <div class="container-fluid px-5">
         <a class="navbar-brand fw-bold fs-4 text-white" href="#">🏋️ Community Gym</a>
@@ -37,12 +37,12 @@
       </div>
     </nav>
 
-    <!-- ✅ 主要内容：课程表 -->
+    
     <div class="container mt-5">
       <h2 class="mb-3">🏋️ Available Fitness Classes</h2>
       <p class="text-muted">Browse, search and sort through our latest fitness programs.</p>
 
-      <!-- 搜索栏 -->
+      
       <div class="mb-3">
         <input
           v-model="searchTerm"
@@ -52,7 +52,7 @@
         />
       </div>
 
-      <!-- 交互表格 -->
+      
       <table class="table table-striped table-hover" v-if="filteredClasses.length">
         <thead class="table-dark">
           <tr>
@@ -75,12 +75,12 @@
         </tbody>
       </table>
 
-      <!-- 空数据提示 -->
+      
       <div v-else class="text-center text-muted mt-4">
         <p>No classes found.</p>
       </div>
 
-      <!-- 分页控制 -->
+      
       <div class="d-flex justify-content-between align-items-center mt-3" v-if="filteredClasses.length">
         <button class="btn btn-outline-primary btn-sm" :disabled="page === 1" @click="prevPage">
           ← Prev
@@ -104,10 +104,10 @@ import { useRouter } from "vue-router"
 import { getAuth, signOut } from "firebase/auth"
 import { getFirestore, collection, getDocs } from "firebase/firestore"
 
-// ✅ Firebase 引用
+
 const db = getFirestore()
 
-// ✅ Vue 状态
+
 const router = useRouter()
 const classes = ref([])
 const searchTerm = ref("")
@@ -115,7 +115,7 @@ const sortKey = ref("")
 const sortAsc = ref(true)
 const loading = ref(true)
 
-// ✅ 从 Firebase Firestore 获取数据
+
 onMounted(async () => {
   try {
     const snapshot = await getDocs(collection(db, "classes"))
@@ -132,7 +132,7 @@ onMounted(async () => {
   }
 })
 
-// ✅ 搜索、排序与分页逻辑
+
 const filteredClasses = computed(() => {
   let data = classes.value.filter(
     (c) =>
@@ -171,7 +171,7 @@ const sortBy = (key) => {
   }
 }
 
-// ✅ 登出功能
+
 const logout = async () => {
   const auth = getAuth()
   await signOut(auth)
@@ -181,7 +181,7 @@ const logout = async () => {
 </script>
 
 <style scoped>
-/* ✅ 导航栏样式统一 */
+
 .navbar-nav .nav-link {
   transition: color 0.2s, background-color 0.2s;
   border-radius: 10px;
@@ -195,7 +195,7 @@ const logout = async () => {
   letter-spacing: 0.5px;
 }
 
-/* 表格样式 */
+
 th {
   cursor: pointer;
 }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- ✅ 导航栏 -->
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
       <div class="container-fluid px-5">
         <a class="navbar-brand fw-bold fs-4 text-white" href="#">🏋️ Community Gym</a>
@@ -37,12 +37,11 @@
       </div>
     </nav>
 
-    <!-- ✅ 教练评分主区域 -->
+
     <div class="container mt-5">
       <h2 class="mb-3">⭐ Rate Your Coach</h2>
       <p class="text-muted">Share your feedback and help improve our coaching service.</p>
 
-      <!-- 教练下拉列表 -->
       <div class="mb-3">
         <label class="form-label fw-bold">Select a Coach:</label>
         <select v-model="selectedCoach" class="form-select">
@@ -53,7 +52,7 @@
         </select>
       </div>
 
-      <!-- 星级评分 -->
+
       <div class="mb-3">
         <label class="form-label fw-bold">Your Rating:</label>
         <div class="stars">
@@ -70,7 +69,7 @@
         <p v-if="rating" class="mt-2">You rated: {{ rating }}/5</p>
       </div>
 
-      <!-- 评论输入 -->
+
       <div class="mb-3">
         <label class="form-label fw-bold">Feedback (optional):</label>
         <textarea
@@ -81,7 +80,7 @@
         ></textarea>
       </div>
 
-      <!-- 提交按钮 -->
+
       <button
         class="btn btn-success btn-lg"
         @click="submitRating"
@@ -102,8 +101,8 @@ import { getFirestore, collection, addDoc, doc, getDoc, Timestamp } from "fireba
 const router = useRouter()
 const db = getFirestore()
 
-// ✅ 从 Firestore 或硬编码中加载教练列表
-// （可以 later 替换为 getDocs(collection(db, "coaches"))）
+
+
 const coaches = [
   { id: "coach1", name: "Alice Johnson" },
   { id: "coach2", name: "Ben Smith" },

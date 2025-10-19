@@ -17,10 +17,10 @@
         <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <router-link class="nav-link px-3 fs-5" to="/coach">👨‍🏫 Dashboard</router-link>
+              <router-link class="nav-link px-3 fs-5 active" to="/coach">👨‍🏫 Dashboard</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link px-3 fs-5 active" to="/coach/rating">⭐ Ratings</router-link>
+              <router-link class="nav-link px-3 fs-5" to="/coach/rating">⭐ Ratings</router-link>
             </li>
           </ul>
 
@@ -34,7 +34,7 @@
     <!-- ✅ 教练评分表部分 -->
     <div class="container mt-5">
       <h2 class="mb-3">⭐ Coach Ratings Overview</h2>
-      <p class="text-muted">View aggregated feedback from clients, with search and sorting.</p>
+      <p class="text-muted">Search, sort and review performance of all trainers.</p>
 
       <!-- 搜索栏 -->
       <div class="mb-3">
@@ -42,7 +42,7 @@
           v-model="searchTerm"
           type="text"
           class="form-control"
-          placeholder="Search by coach name..."
+          placeholder="Search by coach name or specialty..."
         />
       </div>
 
@@ -50,19 +50,21 @@
       <table class="table table-striped table-hover">
         <thead class="table-dark">
           <tr>
-            <th @click="sortBy('coachName')">Coach Name</th>
-            <th @click="sortBy('avgRating')">Average Rating ★</th>
-            <th @click="sortBy('totalRatings')">Total Ratings</th>
-            <th @click="sortBy('uniqueStudents')">Unique Students</th>
+            <th @click="sortBy('name')">Coach Name</th>
+            <th @click="sortBy('specialty')">Specialty</th>
+            <th @click="sortBy('rating')">Rating ★</th>
+            <th @click="sortBy('students')">Students</th>
+            <th @click="sortBy('classes')">Classes</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr v-for="coach in paginatedCoaches" :key="coach.coachId">
-            <td>{{ coach.coachName }}</td>
-            <td>{{ coach.avgRating.toFixed(1) }}</td>
-            <td>{{ coach.totalRatings }}</td>
-            <td>{{ coach.uniqueStudents }}</td>
+          <tr v-for="coach in paginatedCoaches" :key="coach.name">
+            <td>{{ coach.name }}</td>
+            <td>{{ coach.specialty }}</td>
+            <td>{{ coach.rating.toFixed(1) }}</td>
+            <td>{{ coach.students }}</td>
+            <td>{{ coach.classes }}</td>
           </tr>
         </tbody>
       </table>
@@ -86,13 +88,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue"
+import { ref, computed } from "vue"
 import { useRouter } from "vue-router"
 import { getAuth, signOut } from "firebase/auth"
-import { getFirestore, collection, getDocs } from "firebase/firestore"
 
 const router = useRouter()
-const db = getFirestore()
 
 /* 🚪 登出功能 */
 const logout = async () => {
@@ -102,61 +102,30 @@ const logout = async () => {
   router.push("/login")
 }
 
-/* 🧩 Firestore 数据加载 */
-const coaches = ref([])
-const loading = ref(true)
+/* 🧑‍🏫 教练评分数据（可改为 Firestore 读取） */
+const coaches = ref([
+  { name: "Alice Johnson", specialty: "Yoga", rating: 4.8, students: 45, classes: 5 },
+  { name: "Ben Carter", specialty: "HIIT", rating: 4.6, students: 38, classes: 4 },
+  { name: "Cara Liu", specialty: "Pilates", rating: 4.9, students: 52, classes: 6 },
+  { name: "Dylan Smith", specialty: "Strength", rating: 4.7, students: 41, classes: 5 },
+  { name: "Eva Adams", specialty: "Cardio", rating: 4.5, students: 36, classes: 3 },
+  { name: "Frank Zhang", specialty: "Balance", rating: 4.3, students: 30, classes: 3 },
+  { name: "Grace Lee", specialty: "Stretching", rating: 4.9, students: 48, classes: 4 },
+  { name: "Henry Kim", specialty: "CrossFit", rating: 4.4, students: 34, classes: 5 },
+  { name: "Isabella Perez", specialty: "Endurance", rating: 4.7, students: 40, classes: 4 },
+  { name: "Jack Thompson", specialty: "Spin", rating: 4.8, students: 46, classes: 5 },
+])
 
-onMounted(async () => {
-  try {
-    const snapshot = await getDocs(collection(db, "coachRatings"))
-    const ratingsMap = {}
-
-    snapshot.forEach((doc) => {
-      const data = doc.data()
-      const coachId = data.coachId || "unknown"
-      const coachName = data.coachName || "Unknown Coach"
-
-      if (!ratingsMap[coachId]) {
-        ratingsMap[coachId] = {
-          coachId,
-          coachName,
-          ratings: [],
-          users: new Set(),
-        }
-      }
-
-      ratingsMap[coachId].ratings.push(data.rating)
-      ratingsMap[coachId].users.add(data.userId)
-    })
-
-    // 🔢 计算每个教练的平均评分等统计信息
-    coaches.value = Object.values(ratingsMap).map((c) => ({
-      coachId: c.coachId,
-      coachName: c.coachName,
-      avgRating:
-        c.ratings.length > 0
-          ? c.ratings.reduce((a, b) => a + b, 0) / c.ratings.length
-          : 0,
-      totalRatings: c.ratings.length,
-      uniqueStudents: c.users.size,
-    }))
-
-    loading.value = false
-    console.log("✅ Ratings loaded:", coaches.value)
-  } catch (err) {
-    console.error("🔥 Error loading ratings:", err)
-    alert("❌ Failed to load ratings from Firestore.")
-  }
-})
-
-/* 🔍 搜索、排序、分页 */
+/* 🔍 搜索、排序与分页 */
 const searchTerm = ref("")
-const sortKey = ref("coachName")
+const sortKey = ref("")
 const sortAsc = ref(true)
 
 const filteredCoaches = computed(() => {
-  let data = coaches.value.filter((c) =>
-    c.coachName.toLowerCase().includes(searchTerm.value.toLowerCase())
+  let data = coaches.value.filter(
+    (c) =>
+      c.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+      c.specialty.toLowerCase().includes(searchTerm.value.toLowerCase())
   )
   if (sortKey.value) {
     data.sort((a, b) => {
@@ -171,6 +140,7 @@ const filteredCoaches = computed(() => {
 const page = ref(1)
 const perPage = 5
 const totalPages = computed(() => Math.ceil(filteredCoaches.value.length / perPage))
+
 const paginatedCoaches = computed(() => {
   const start = (page.value - 1) * perPage
   return filteredCoaches.value.slice(start, start + perPage)
@@ -182,6 +152,7 @@ const nextPage = () => {
 const prevPage = () => {
   if (page.value > 1) page.value--
 }
+
 const sortBy = (key) => {
   if (sortKey.value === key) sortAsc.value = !sortAsc.value
   else {

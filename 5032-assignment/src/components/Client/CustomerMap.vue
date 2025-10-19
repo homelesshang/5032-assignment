@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- ✅ 顶部导航栏 -->
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
       <div class="container-fluid px-5">
         <a class="navbar-brand fw-bold fs-4 text-white" href="#">🏋️ Community Gym</a>
@@ -37,11 +37,11 @@
       </div>
     </nav>
 
-    <!-- ✅ 地图部分 -->
+
     <div class="map-page">
       <h2 class="title mt-4">Find Gyms Near You</h2>
 
-      <!-- 按钮区 -->
+
       <div class="btn-group mb-3">
         <button class="btn btn-primary" @click="showMyLocation" :disabled="!isMapReady">
           📍 Show My Location
@@ -70,27 +70,27 @@ const userMarker = ref(null)
 const gymMarkers = ref([])
 const isMapReady = ref(false)
 
-/* ✅ 异步加载 Google Maps (旧版稳定版，无 marker 库) */
+
 async function loadGoogleMaps() {
   return new Promise((resolve, reject) => {
     if (window.google && window.google.maps) {
-      console.log("✅ Google Maps 已存在，跳过加载")
+      console.log("✅ ")
       return resolve()
     }
 
     const script = document.createElement("script")
-    // 👇 使用 v=3.54 (最后一个不强制 Map ID 的版本)
+
     script.src =
       "https://maps.googleapis.com/maps/api/js?key=AIzaSyAZnIG0rn9CeOBGomjZCI5zK_tESvr1oEk&v=3.54&callback=initMap"
     script.async = true
 
     window.initMap = () => {
-      console.log("✅ Google Maps 脚本加载完成 (v3.54)")
+      console.log("✅")
       resolve()
     }
 
     script.onerror = (err) => {
-      console.error("❌ Google Maps 加载失败:", err)
+      console.error("❌ :", err)
       reject(err)
     }
 
@@ -98,14 +98,14 @@ async function loadGoogleMaps() {
   })
 }
 
-/* ✅ 初始化地图 */
+
 onMounted(async () => {
   try {
     await loadGoogleMaps()
     map.value = new google.maps.Map(document.getElementById("map"), {
       center: { lat: -37.913, lng: 145.13 },
       zoom: 14,
-      mapId: undefined, // 禁用新版地图ID依赖
+      mapId: undefined, 
     })
     isMapReady.value = true
     console.log("✅ Map initialized.")
@@ -114,7 +114,7 @@ onMounted(async () => {
   }
 })
 
-/* 📍 显示用户位置 */
+
 async function showMyLocation() {
   if (!isMapReady.value || !map.value)
     return alert("⚠️ Map still loading. Please wait.")
@@ -128,7 +128,7 @@ async function showMyLocation() {
         lng: pos.coords.longitude,
       }
 
-      // 删除旧标记
+
       if (userMarker.value) userMarker.value.setMap(null)
 
       userMarker.value = new google.maps.Marker({
@@ -155,12 +155,12 @@ async function showMyLocation() {
   )
 }
 
-/* 🏋️ 从 Firestore 加载健身房 */
+
 async function loadCommunityGyms() {
   if (!isMapReady.value || !map.value)
     return alert("⚠️ Map not ready yet.")
 
-  // 清空旧标记
+
   gymMarkers.value.forEach((m) => m.setMap(null))
   gymMarkers.value = []
 
@@ -195,7 +195,7 @@ async function loadCommunityGyms() {
   }
 }
 
-/* 🚪 登出功能 */
+
 const logout = async () => {
   const auth = getAuth()
   await signOut(auth)
@@ -226,7 +226,7 @@ const logout = async () => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* ✅ 导航栏样式 */
+
 .navbar-nav .nav-link {
   transition: color 0.2s, background-color 0.2s;
   border-radius: 10px;
