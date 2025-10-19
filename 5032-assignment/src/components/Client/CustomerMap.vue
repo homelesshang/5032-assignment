@@ -25,6 +25,9 @@
             <li class="nav-item">
               <router-link class="nav-link px-3 fs-5 active" to="/customer-map">🧭 Map</router-link>
             </li>
+            <li class="nav-item">
+              <router-link class="nav-link px-3 fs-5" to="/rating">⭐ Rate Coach</router-link>
+            </li>
           </ul>
 
           <button class="btn btn-outline-light btn-lg px-4" @click="logout">

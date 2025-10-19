@@ -82,8 +82,12 @@
       </div>
 
       <!-- 提交按钮 -->
-      <button class="btn btn-success btn-lg" @click="submitRating" :disabled="!selectedCoach || !rating">
-        ✅ Submit Rating
+      <button
+        class="btn btn-success btn-lg"
+        @click="submitRating"
+        :disabled="!selectedCoach || !rating || isSubmitting"
+      >
+        {{ isSubmitting ? "Submitting..." : "✅ Submit Rating" }}
       </button>
     </div>
   </div>
@@ -93,12 +97,13 @@
 import { ref } from "vue"
 import { useRouter } from "vue-router"
 import { getAuth, signOut } from "firebase/auth"
-import { getFirestore, collection, addDoc, Timestamp } from "firebase/firestore"
+import { getFirestore, collection, addDoc, doc, getDoc, Timestamp } from "firebase/firestore"
 
 const router = useRouter()
 const db = getFirestore()
 
-// 模拟教练列表
+// ✅ 从 Firestore 或硬编码中加载教练列表
+// （可以 later 替换为 getDocs(collection(db, "coaches"))）
 const coaches = [
   { id: "coach1", name: "Alice Johnson" },
   { id: "coach2", name: "Ben Smith" },
@@ -108,27 +113,34 @@ const coaches = [
 const selectedCoach = ref("")
 const rating = ref(0)
 const feedback = ref("")
+const isSubmitting = ref(false)
 
-// 打星函数
 function setRating(value) {
   rating.value = value
 }
 
-// 提交评分
+// ✅ 提交评分并存入 Firestore
 async function submitRating() {
   try {
     const auth = getAuth()
     const user = auth.currentUser
     if (!user) {
-      alert("Please log in first.")
+      alert("⚠️ Please log in first.")
       return router.push("/login")
     }
 
-    await addDoc(collection(db, "ratings"), {
+    isSubmitting.value = true
+
+    // 获取用户信息（名字或邮箱）
+    const userName = user.displayName || user.email || "Anonymous"
+
+    await addDoc(collection(db, "coachRatings"), {
       coachId: selectedCoach.value,
+      coachName: coaches.find((c) => c.id === selectedCoach.value)?.name || "Unknown Coach",
       userId: user.uid,
+      userName,
       rating: rating.value,
-      feedback: feedback.value,
+      feedback: feedback.value || "(No feedback)",
       createdAt: Timestamp.now(),
     })
 
@@ -139,10 +151,12 @@ async function submitRating() {
   } catch (err) {
     console.error("🔥 Error submitting rating:", err)
     alert("❌ Failed to submit rating.")
+  } finally {
+    isSubmitting.value = false
   }
 }
 
-// 登出逻辑
+// 🚪 登出逻辑
 const logout = async () => {
   const auth = getAuth()
   await signOut(auth)
@@ -152,7 +166,7 @@ const logout = async () => {
 </script>
 
 <style scoped>
-/* 导航栏样式复用 */
+/* ✅ 导航栏样式统一 */
 .navbar-nav .nav-link {
   transition: color 0.2s, background-color 0.2s;
   border-radius: 10px;
@@ -166,7 +180,7 @@ const logout = async () => {
   letter-spacing: 0.5px;
 }
 
-/* 星星样式 */
+/* ⭐ 星星样式 */
 .stars {
   font-size: 2rem;
   color: #ccc;
