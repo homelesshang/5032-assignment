@@ -1,7 +1,7 @@
 <template>
   <div class="register-wrapper d-flex align-items-center justify-content-center">
     <div class="register-card shadow-lg p-4">
-      <!-- Logo & 标题 -->
+
       <div class="text-center mb-4">
         <img
           src="https://cdn-icons-png.flaticon.com/512/2964/2964514.png"
@@ -12,12 +12,12 @@
         <p class="text-secondary">Join the movement. Train smarter.</p>
       </div>
 
-      <!-- 错误提示 -->
+ 
       <div v-if="errorMessage" class="alert alert-danger text-center py-2">
         {{ errorMessage }}
       </div>
 
-      <!-- 注册表单 -->
+
       <form @submit.prevent="handleRegister" novalidate>
         <!-- 全名 -->
         <div class="mb-3">
@@ -31,7 +31,7 @@
           />
         </div>
 
-        <!-- 邮箱 -->
+ 
         <div class="mb-3">
           <label for="email" class="form-label text-light">Email</label>
           <input
@@ -43,7 +43,7 @@
           />
         </div>
 
-        <!-- 密码 -->
+ 
         <div class="mb-3">
           <label for="password" class="form-label text-light">Password</label>
           <input
@@ -55,7 +55,7 @@
           />
         </div>
 
-        <!-- 确认密码 -->
+   
         <div class="mb-3">
           <label for="confirmPassword" class="form-label text-light">Confirm Password</label>
           <input
@@ -67,7 +67,7 @@
           />
         </div>
 
-        <!-- 选择角色 -->
+    
         <div class="mb-4">
           <label class="form-label text-light fw-bold">Select Role</label>
           <div class="d-flex justify-content-around">
@@ -94,7 +94,7 @@
           </div>
         </div>
 
-        <!-- 同意条款 -->
+     
         <div class="form-check mb-3">
           <input id="agreeTerms" v-model="agreeTerms" type="checkbox" class="form-check-input" />
           <label for="agreeTerms" class="form-check-label text-light">
@@ -102,7 +102,7 @@
           </label>
         </div>
 
-        <!-- 按钮 -->
+      
         <div class="text-center">
           <button type="submit" class="btn btn-warning w-100 py-2 fw-bold shadow-sm">
             {{ loading ? "Creating Account..." : "Create Account" }}
@@ -130,7 +130,7 @@ const db = getFirestore()
 const functions = getFunctions()
 const sendEmailFn = httpsCallable(functions, "sendEmailWithAttachment")
 
-// 表单字段
+
 const fullName = ref("")
 const email = ref("")
 const password = ref("")
@@ -140,7 +140,7 @@ const agreeTerms = ref(false)
 const errorMessage = ref("")
 const loading = ref(false)
 
-// 注册逻辑
+
 const handleRegister = async () => {
   if (
     !fullName.value ||
@@ -168,7 +168,7 @@ const handleRegister = async () => {
       createdAt: serverTimestamp(),
     })
 
-    // 发送欢迎邮件
+   
     await sendEmailFn({
       to: email.value,
       subject: "Welcome to Community Gym!",
@@ -187,7 +187,7 @@ const handleRegister = async () => {
 </script>
 
 <style scoped>
-/* 🏋️ 背景 */
+
 .register-wrapper {
   min-height: 100vh;
   background: linear-gradient(135deg, #0b0c10, #1f2833);
@@ -196,7 +196,7 @@ const handleRegister = async () => {
   background-position: center;
 }
 
-/* 📦 注册卡片 */
+
 .register-card {
   background: rgba(0, 0, 0, 0.8);
   border-radius: 16px;
@@ -206,13 +206,13 @@ const handleRegister = async () => {
   backdrop-filter: blur(10px);
 }
 
-/* 💪 Logo */
+
 .gym-logo {
   width: 70px;
   filter: drop-shadow(0 0 6px rgba(255, 193, 7, 0.8));
 }
 
-/* 表单 */
+
 .form-control {
   background-color: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -226,7 +226,7 @@ const handleRegister = async () => {
   color: rgba(255, 255, 255, 0.6);
 }
 
-/* 按钮 */
+
 .btn-warning {
   background: linear-gradient(45deg, #ffb300, #ff8800);
   border: none;
@@ -237,7 +237,7 @@ const handleRegister = async () => {
   background: linear-gradient(45deg, #ffa000, #ff6f00);
 }
 
-/* 响应式 */
+
 @media (max-width: 576px) {
   .register-card {
     width: 90%;

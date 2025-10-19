@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- ✅ 顶部导航栏 -->
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
       <div class="container-fluid px-5">
         <a class="navbar-brand fw-bold fs-4 text-white" href="#">🏋️ Community Gym</a>
@@ -31,46 +31,52 @@
       </div>
     </nav>
 
-    <!-- ✅ 教练评分表部分 -->
+
     <div class="container mt-5">
       <h2 class="mb-3">⭐ Coach Ratings Overview</h2>
-      <p class="text-muted">Search, sort and review performance of all trainers.</p>
+      <p class="text-muted">View all client feedback stored in Firestore.</p>
 
-      <!-- 搜索栏 -->
+
       <div class="mb-3">
         <input
           v-model="searchTerm"
           type="text"
           class="form-control"
-          placeholder="Search by coach name or specialty..."
+          placeholder="Search by coach name..."
         />
       </div>
 
-      <!-- 教练评分表 -->
-      <table class="table table-striped table-hover">
+
+      <div v-if="loading" class="text-center my-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 text-muted">Loading coach ratings from Firestore...</p>
+      </div>
+
+
+      <table v-else class="table table-striped table-hover">
         <thead class="table-dark">
           <tr>
-            <th @click="sortBy('name')">Coach Name</th>
-            <th @click="sortBy('specialty')">Specialty</th>
-            <th @click="sortBy('rating')">Rating ★</th>
-            <th @click="sortBy('students')">Students</th>
-            <th @click="sortBy('classes')">Classes</th>
+            <th @click="sortBy('coachName')">Coach Name</th>
+            <th @click="sortBy('avgRating')">Average Rating ★</th>
+            <th @click="sortBy('totalRatings')">Total Ratings</th>
+            <th @click="sortBy('uniqueStudents')">Unique Students</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr v-for="coach in paginatedCoaches" :key="coach.name">
-            <td>{{ coach.name }}</td>
-            <td>{{ coach.specialty }}</td>
-            <td>{{ coach.rating.toFixed(1) }}</td>
-            <td>{{ coach.students }}</td>
-            <td>{{ coach.classes }}</td>
+          <tr v-for="coach in paginatedCoaches" :key="coach.coachId">
+            <td>{{ coach.coachName }}</td>
+            <td>{{ coach.avgRating ? coach.avgRating.toFixed(1) : '0.0' }}</td>
+            <td>{{ coach.totalRatings }}</td>
+            <td>{{ coach.uniqueStudents }}</td>
           </tr>
         </tbody>
       </table>
 
-      <!-- 分页控制 -->
-      <div class="d-flex justify-content-between align-items-center mt-3">
+
+      <div v-if="!loading" class="d-flex justify-content-between align-items-center mt-3">
         <button class="btn btn-outline-primary btn-sm" :disabled="page === 1" @click="prevPage">
           ← Prev
         </button>
@@ -88,13 +94,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue"
+import { ref, computed, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { getAuth, signOut } from "firebase/auth"
+import { getFirestore, collection, getDocs } from "firebase/firestore"
 
 const router = useRouter()
+const db = getFirestore()
 
-/* 🚪 登出功能 */
+
 const logout = async () => {
   const auth = getAuth()
   await signOut(auth)
@@ -102,30 +110,67 @@ const logout = async () => {
   router.push("/login")
 }
 
-/* 🧑‍🏫 教练评分数据（可改为 Firestore 读取） */
-const coaches = ref([
-  { name: "Alice Johnson", specialty: "Yoga", rating: 4.8, students: 45, classes: 5 },
-  { name: "Ben Carter", specialty: "HIIT", rating: 4.6, students: 38, classes: 4 },
-  { name: "Cara Liu", specialty: "Pilates", rating: 4.9, students: 52, classes: 6 },
-  { name: "Dylan Smith", specialty: "Strength", rating: 4.7, students: 41, classes: 5 },
-  { name: "Eva Adams", specialty: "Cardio", rating: 4.5, students: 36, classes: 3 },
-  { name: "Frank Zhang", specialty: "Balance", rating: 4.3, students: 30, classes: 3 },
-  { name: "Grace Lee", specialty: "Stretching", rating: 4.9, students: 48, classes: 4 },
-  { name: "Henry Kim", specialty: "CrossFit", rating: 4.4, students: 34, classes: 5 },
-  { name: "Isabella Perez", specialty: "Endurance", rating: 4.7, students: 40, classes: 4 },
-  { name: "Jack Thompson", specialty: "Spin", rating: 4.8, students: 46, classes: 5 },
-])
 
-/* 🔍 搜索、排序与分页 */
+const coaches = ref([])
+const loading = ref(true)
+
+onMounted(async () => {
+  try {
+    console.log("🔥 ...")
+    const snapshot = await getDocs(collection(db, "coachRatings"))
+    console.log("📦 :", snapshot.size)
+
+    const coachMap = {}
+
+    snapshot.forEach((doc) => {
+      const data = doc.data()
+      const coachId = data.coachId || "unknown"
+      const coachName = data.coachName || "Unknown Coach"
+      const ratingNum = Number(data.rating)
+      const userId = data.userId || "unknown"
+
+      if (!coachMap[coachId]) {
+        coachMap[coachId] = {
+          coachId,
+          coachName,
+          ratings: [],
+          users: new Set(),
+        }
+      }
+
+      if (!isNaN(ratingNum)) coachMap[coachId].ratings.push(ratingNum)
+      coachMap[coachId].users.add(userId)
+    })
+
+
+    coaches.value = Object.values(coachMap).map((c) => ({
+      coachId: c.coachId,
+      coachName: c.coachName,
+      avgRating:
+        c.ratings.length > 0
+          ? c.ratings.reduce((a, b) => a + b, 0) / c.ratings.length
+          : 0,
+      totalRatings: c.ratings.length,
+      uniqueStudents: c.users.size,
+    }))
+
+    console.log("✅ :", coaches.value)
+  } catch (err) {
+    console.error("🔥 Firestore :", err)
+    alert("❌ Failed to load data from Firestore.")
+  } finally {
+    loading.value = false
+  }
+})
+
+
 const searchTerm = ref("")
-const sortKey = ref("")
+const sortKey = ref("coachName")
 const sortAsc = ref(true)
 
 const filteredCoaches = computed(() => {
-  let data = coaches.value.filter(
-    (c) =>
-      c.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-      c.specialty.toLowerCase().includes(searchTerm.value.toLowerCase())
+  let data = coaches.value.filter((c) =>
+    c.coachName.toLowerCase().includes(searchTerm.value.toLowerCase())
   )
   if (sortKey.value) {
     data.sort((a, b) => {
@@ -140,7 +185,6 @@ const filteredCoaches = computed(() => {
 const page = ref(1)
 const perPage = 5
 const totalPages = computed(() => Math.ceil(filteredCoaches.value.length / perPage))
-
 const paginatedCoaches = computed(() => {
   const start = (page.value - 1) * perPage
   return filteredCoaches.value.slice(start, start + perPage)
@@ -152,7 +196,6 @@ const nextPage = () => {
 const prevPage = () => {
   if (page.value > 1) page.value--
 }
-
 const sortBy = (key) => {
   if (sortKey.value === key) sortAsc.value = !sortAsc.value
   else {
@@ -163,7 +206,7 @@ const sortBy = (key) => {
 </script>
 
 <style scoped>
-/* ✅ 导航栏样式统一 */
+
 .navbar-nav .nav-link {
   transition: color 0.2s, background-color 0.2s;
   border-radius: 10px;
@@ -177,7 +220,7 @@ const sortBy = (key) => {
   letter-spacing: 0.5px;
 }
 
-/* 表格样式 */
+
 th {
   cursor: pointer;
 }

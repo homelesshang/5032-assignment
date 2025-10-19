@@ -118,7 +118,7 @@ function setRating(value) {
   rating.value = value
 }
 
-// ✅ 提交评分并存入 Firestore
+
 async function submitRating() {
   try {
     const auth = getAuth()
@@ -130,7 +130,7 @@ async function submitRating() {
 
     isSubmitting.value = true
 
-    // 获取用户信息（名字或邮箱）
+
     const userName = user.displayName || user.email || "Anonymous"
 
     await addDoc(collection(db, "coachRatings"), {
@@ -155,7 +155,7 @@ async function submitRating() {
   }
 }
 
-// 🚪 登出逻辑
+
 const logout = async () => {
   const auth = getAuth()
   await signOut(auth)
@@ -165,7 +165,7 @@ const logout = async () => {
 </script>
 
 <style scoped>
-/* ✅ 导航栏样式统一 */
+
 .navbar-nav .nav-link {
   transition: color 0.2s, background-color 0.2s;
   border-radius: 10px;
@@ -179,7 +179,7 @@ const logout = async () => {
   letter-spacing: 0.5px;
 }
 
-/* ⭐ 星星样式 */
+
 .stars {
   font-size: 2rem;
   color: #ccc;

@@ -1,7 +1,7 @@
 <template>
   <div class="login-wrapper d-flex align-items-center justify-content-center">
     <div class="login-card shadow-lg p-4">
-      <!-- 标志与标题 -->
+
       <div class="text-center mb-4">
         <img
           src="https://cdn-icons-png.flaticon.com/512/2964/2964514.png"
@@ -12,14 +12,14 @@
         <p class="text-secondary">Train. Transform. Triumph.</p>
       </div>
 
-      <!-- 错误提示 -->
+
       <div v-if="errorMessage" class="alert alert-danger py-2 text-center">
         {{ errorMessage }}
       </div>
 
-      <!-- 登录表单 -->
+
       <form @submit.prevent="signin" class="mt-3" novalidate>
-        <!-- 邮箱 -->
+      
         <div class="mb-3">
           <label for="email" class="form-label text-light">Email</label>
           <input
@@ -33,7 +33,7 @@
           <div v-if="emailError" class="invalid-feedback">Email is required</div>
         </div>
 
-        <!-- 密码 -->
+  
         <div class="mb-3">
           <label for="password" class="form-label text-light">Password</label>
           <input
@@ -47,7 +47,7 @@
           <div v-if="passwordError" class="invalid-feedback">Password is required</div>
         </div>
 
-        <!-- 登录按钮 -->
+
         <div class="text-center mt-4">
           <button type="submit" class="btn btn-warning w-100 py-2 fw-bold shadow-sm">
             {{ loading ? "Logging in..." : "Login" }}
@@ -126,7 +126,7 @@ const signin = async () => {
 </script>
 
 <style scoped>
-/* 🔥 背景样式 */
+
 .login-wrapper {
   min-height: 100vh;
   background: linear-gradient(135deg, #0b0c10, #1f2833);
@@ -135,7 +135,7 @@ const signin = async () => {
   background-position: center;
 }
 
-/* 💪 登录卡片 */
+
 .login-card {
   background: rgba(0, 0, 0, 0.75);
   border-radius: 16px;
@@ -145,13 +145,13 @@ const signin = async () => {
   backdrop-filter: blur(10px);
 }
 
-/* 🏋️ Logo */
+
 .gym-logo {
   width: 70px;
   filter: drop-shadow(0 0 6px rgba(255, 193, 7, 0.8));
 }
 
-/* 🧩 输入框美化 */
+
 .form-control {
   background-color: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -165,7 +165,7 @@ const signin = async () => {
   color: rgba(255, 255, 255, 0.6);
 }
 
-/* ⚡ 按钮样式 */
+
 .btn-warning {
   background: linear-gradient(45deg, #ffb300, #ff8800);
   border: none;
@@ -176,7 +176,7 @@ const signin = async () => {
   background: linear-gradient(45deg, #ffa000, #ff6f00);
 }
 
-/* 📱 响应式 */
+
 @media (max-width: 576px) {
   .login-card {
     width: 90%;

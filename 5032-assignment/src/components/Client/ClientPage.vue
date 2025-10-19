@@ -1,7 +1,7 @@
 <template>
-  <div>
- 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
+  <div class="client-page">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3 fixed-top">
       <div class="container-fluid px-5">
         <a class="navbar-brand fw-bold fs-4 text-white" href="#">🏋️ Community Gym</a>
 
@@ -38,69 +38,79 @@
     </nav>
 
 
-    <div class="dashboard container mt-5 text-center">
-      <h2 class="fw-bold mb-3">Welcome back, {{ userName || "Guest" }}! 👋</h2>
-      <p class="text-muted mb-4">
-        Manage your fitness journey, explore classes, find gyms, and rate your coaches — all in one place.
-      </p>
+    <header class="hero-section text-white text-center d-flex flex-column justify-content-center">
+      <div class="container">
+        <h1 class="fw-bold display-4 mb-3 animate__animated animate__fadeInDown">
+          Welcome to <span class="text-warning">Community Gym</span>
+        </h1>
+        <p class="lead animate__animated animate__fadeInUp">
+          Empower • Inspire • Transform
+        </p>
+        
+      </div>
+    </header>
 
-      <div class="row justify-content-center mt-4">
-        <!-- 📋 Classes -->
-        <div class="col-md-3 mb-3">
-          <div class="card shadow-lg option-card" @click="goTo('/classes')">
+    <div class="container my-5 text-center">
+      <h2 class="fw-bold mb-4 text-dark">🔥 Why You'll Love Training Here</h2>
+      <div class="row g-4">
+        <div class="col-md-4" v-for="(item, i) in gymHighlights" :key="i">
+          <div class="card border-0 shadow-lg h-100 hover-card p-3">
+            <img :src="item.url" class="card-img-top rounded" />
             <div class="card-body">
-              <h4>📋 View Classes</h4>
-              <p class="text-muted">Explore available fitness programs.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 🧭 Map -->
-        <div class="col-md-3 mb-3">
-          <div class="card shadow-lg option-card" @click="goTo('/customer-map')">
-            <div class="card-body">
-              <h4>🧭 Find Gyms</h4>
-              <p class="text-muted">Locate gyms around your area.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- ⭐ Rate -->
-        <div class="col-md-3 mb-3">
-          <div class="card shadow-lg option-card" @click="goTo('/rating')">
-            <div class="card-body">
-              <h4>⭐ Rate Coaches</h4>
-              <p class="text-muted">Share your feedback with us.</p>
+              <h5 class="card-title fw-bold">{{ item.title }}</h5>
+              <p class="card-text text-muted">{{ item.desc }}</p>
             </div>
           </div>
         </div>
       </div>
-
-      <p class="text-secondary mt-4">
-        💪 Stay motivated — your consistency is your superpower!
-      </p>
     </div>
+
+
+    <section class="trainers-section py-5 text-center bg-light">
+      <div class="container">
+        <h2 class="fw-bold mb-5 text-dark">💪 Meet Our Expert Trainers</h2>
+        <div class="row g-4 justify-content-center">
+          <div
+            class="col-md-4"
+            v-for="(coach, index) in coaches"
+            :key="index"
+          >
+            <div class="card coach-card border-0 shadow-sm p-4">
+              <img
+                :src="coach.photo"
+                class="rounded-circle mx-auto mb-3 border border-3 border-warning"
+                width="130"
+                height="130"
+                alt="coach"
+              />
+              <h5 class="fw-bold">{{ coach.name }}</h5>
+              <p class="text-warning fw-semibold">{{ coach.specialty }}</p>
+              <p class="text-muted small">{{ coach.desc }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="quote-section text-center py-5 bg-dark text-white">
+      <blockquote class="fs-4 fst-italic">
+        "Your body can stand almost anything — it’s your mind you have to convince."
+      </blockquote>
+      <p class="text-warning fw-bold mt-2">— Community Gym Spirit</p>
+    </section>
+
+
+    <footer class="footer py-3 bg-black text-center text-secondary">
+      <small>© 2025 Community Gym | Empowering Strength & Confidence 💪</small>
+    </footer>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { getAuth, signOut } from "firebase/auth"
 
 const router = useRouter()
-const userName = ref("")
-
-
-onMounted(() => {
-  const auth = getAuth()
-  if (auth.currentUser) {
-    const email = auth.currentUser.email
-    userName.value = email ? email.split("@")[0] : "User"
-  }
-})
-
-
 const logout = async () => {
   const auth = getAuth()
   await signOut(auth)
@@ -109,50 +119,91 @@ const logout = async () => {
 }
 
 
-function goTo(path) {
-  router.push(path)
-}
+const gymHighlights = [
+  {
+    title: "Modern Equipment",
+    desc: "Top-tier fitness machines to power your progress.",
+    url: "https://images.unsplash.com/photo-1558611848-73f7eb4001a1?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    title: "Energetic Classes",
+    desc: "Join HIIT, Yoga, and Spin sessions led by our top coaches.",
+    url: "https://images.unsplash.com/photo-1554284126-aa88f22d8b74?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    title: "Friendly Atmosphere",
+    desc: "A positive, motivating community that supports your goals.",
+    url: "https://images.unsplash.com/photo-1593079831268-3381b0db4a77?auto=format&fit=crop&w=900&q=80",
+  },
+]
+
+
+const coaches = [
+  {
+    name: "Ben Smith",
+    specialty: "Strength & Conditioning",
+    desc: "Helping clients achieve their goals through smart, effective training.",
+    photo: "https://randomuser.me/api/portraits/men/32.jpg",
+  },
+  {
+    name: "Alice Johnson",
+    specialty: "Yoga & Flexibility",
+    desc: "Find your balance — physically and mentally — with guided sessions.",
+    photo: "https://randomuser.me/api/portraits/women/44.jpg",
+  },
+  {
+    name: "Henry Kim",
+    specialty: "CrossFit & Endurance",
+    desc: "Push your limits with high-intensity workouts and motivation.",
+    photo: "https://randomuser.me/api/portraits/men/70.jpg",
+  },
+]
 </script>
 
 <style scoped>
+/* 🌆 Hero Section */
+.hero-section {
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    url("https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=1920&q=80")
+      center/cover no-repeat;
+  height: 90vh;
+}
+
+
+.card img {
+  object-fit: cover;
+  height: 220px;
+  border-radius: 10px;
+}
+.hover-card:hover {
+  transform: translateY(-8px);
+  transition: all 0.4s ease;
+}
+
+
+.coach-card {
+  border-radius: 16px;
+  background-color: white;
+  transition: 0.3s;
+}
+.coach-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+
+.quote-section {
+  background: radial-gradient(circle at top, #111 0%, #000 80%);
+  font-family: "Georgia", serif;
+}
+
 
 .navbar-nav .nav-link {
-  transition: color 0.2s, background-color 0.2s;
+  transition: 0.3s;
   border-radius: 10px;
 }
 .navbar-nav .nav-link:hover {
   background-color: rgba(255, 255, 255, 0.15);
   color: #fff !important;
-}
-.navbar {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  letter-spacing: 0.5px;
-}
-
-
-.dashboard {
-  animation: fadeIn 0.8s ease-in-out;
-}
-.option-card {
-  border-radius: 15px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.option-card:hover {
-  transform: scale(1.05);
-  background-color: #f8f9fa;
-}
-.option-card h4 {
-  font-weight: 600;
-}
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 </style>
