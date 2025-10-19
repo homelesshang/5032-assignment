@@ -44,6 +44,9 @@
           class="form-control"
           placeholder="Search by coach name..."
         />
+        <button class="btn btn-success ms-3" @click="exportToCSV">
+          ⬇️ Export to CSV
+        </button>
       </div>
 
 
@@ -202,6 +205,22 @@ const sortBy = (key) => {
     sortKey.value = key
     sortAsc.value = true
   }
+}
+
+const exportToCSV = () => {
+  const headers = ["Coach Name", "Average Rating", "Total Ratings", "Unique Students"]
+  const rows = coaches.value.map((c) => [
+    c.coachName,
+    c.avgRating.toFixed(1),
+    c.totalRatings,
+    c.uniqueStudents,
+  ])
+  let csv = headers.join(",") + "\n" + rows.map((r) => r.join(",")).join("\n")
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+  const link = document.createElement("a")
+  link.href = URL.createObjectURL(blob)
+  link.download = "coach_ratings.csv"
+  link.click()
 }
 </script>
 
